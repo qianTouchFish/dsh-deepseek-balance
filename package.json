@@ -14,9 +14,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qianTouchFish/deepseek-api-status.git"
+    "url": "git+https://github.com/qianTouchFish/dsh-deepseek-balance.git"
   },
-  "homepage": "https://github.com/qianTouchFish/deepseek-api-status",
+  "homepage": "https://github.com/qianTouchFish/dsh-deepseek-balance",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

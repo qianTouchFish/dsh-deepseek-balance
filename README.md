@@ -21,10 +21,10 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **we
 
 ```sh
 # 方式一:从 GitHub 安装(推荐)
-dsh plugin --profile web add github:qianTouchFish/deepseek-api-status
+dsh plugin --profile web add github:qianTouchFish/dsh-deepseek-balance
 
 # 方式二:完整 git URL
-dsh plugin --profile web add git+https://github.com/qianTouchFish/deepseek-api-status.git
+dsh plugin --profile web add git+https://github.com/qianTouchFish/dsh-deepseek-balance.git
 
 # 方式三:本地目录(开发调试)
 cd deepseek-api-status && dsh plugin --profile web add .
