@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420" font-family="system-ui, -apple-system, sans-serif">
+  <rect width="720" height="420" rx="16" fill="#f7f8fa"/>
+  <!-- sidebar -->
+  <rect x="24" y="20" width="230" height="380" rx="12" fill="#ffffff" stroke="#d9dee5"/>
+  <text x="44" y="52" font-size="13" fill="#57606a">侧边栏 Sidebar</text>
+  <rect x="44" y="70" width="150" height="28" rx="6" fill="#eef1f4"/>
+  <text x="52" y="89" font-size="12" fill="#57606a">会话列表…</text>
+  <line x1="44" y1="120" x2="234" y2="120" stroke="#eef1f4"/>
+  <!-- balance strip (above settings) -->
+  <rect x="36" y="262" width="206" height="46" rx="8" fill="#fff8e6" stroke="#e0b400"/>
+  <text x="46" y="280" font-size="12" font-weight="700" fill="#8a6d00">余额 ¥0.09 CNY</text>
+  <text x="146" y="280" font-size="12" fill="#8a6d00">今日 ≈¥2.46</text>
+  <text x="46" y="298" font-size="11" fill="#a08020">累计 ≈¥0.21 · 42.2M tok · 212 次</text>
+  <text x="42" y="256" font-size="10" fill="#57606a">↑ 本插件(常显,60s 刷新)</text>
+  <!-- settings button -->
+  <rect x="36" y="318" width="206" height="34" rx="8" fill="#eef1f4"/>
+  <circle cx="56" cy="335" r="5" fill="#9aa4af"/>
+  <text x="70" y="339" font-size="13" fill="#24292f">设置 Settings</text>
+  <!-- main area -->
+  <rect x="274" y="20" width="422" height="380" rx="12" fill="#ffffff" stroke="#d9dee5"/>
+  <text x="294" y="52" font-size="13" fill="#57606a">对话区(详情卡片在此弹出)</text>
+  <!-- detail card -->
+  <rect x="290" y="90" width="280" height="240" rx="12" fill="#ffffff" stroke="#c9d1d9" filter="drop-shadow(0 6px 16px rgba(0,0,0,0.12))"/>
+  <rect x="290" y="90" width="280" height="36" rx="12" fill="#f6f8fa"/>
+  <text x="304" y="113" font-size="13" font-weight="700" fill="#24292f">DeepSeek API 状态</text>
+  <text x="548" y="113" font-size="14" fill="#57606a">×</text>
+  <circle cx="310" cy="146" r="4" fill="#2e9e5b"/>
+  <text x="322" y="150" font-size="12" fill="#24292f">额度可用</text>
+  <text x="310" y="182" font-size="22" font-weight="700" fill="#e0b400">¥0.09 CNY</text>
+  <text x="430" y="182" font-size="11" fill="#57606a">总额</text>
+  <line x1="306" y1="196" x2="554" y2="196" stroke="#eef1f4"/>
+  <text x="310" y="220" font-size="11" fill="#57606a">今日消费</text><text x="500" y="220" font-size="11" font-weight="600" fill="#24292f">≈¥2.46</text>
+  <text x="310" y="240" font-size="11" fill="#57606a">本月消费</text><text x="500" y="240" font-size="11" font-weight="600" fill="#24292f">¥10.58</text>
+  <text x="310" y="260" font-size="11" fill="#57606a">累计消费(估算)</text><text x="500" y="260" font-size="11" font-weight="600" fill="#24292f">≈¥0.21</text>
+  <text x="310" y="280" font-size="11" fill="#57606a">今日 Tokens</text><text x="500" y="280" font-size="11" font-weight="600" fill="#24292f">42,187,381</text>
+  <text x="310" y="300" font-size="11" fill="#57606a">今日请求次数</text><text x="500" y="300" font-size="11" font-weight="600" fill="#24292f">212</text>
+  <text x="310" y="320" font-size="11" fill="#57606a">密钥</text><text x="500" y="320" font-size="11" font-weight="600" fill="#24292f">sk-4***7f83</text>
+</svg>

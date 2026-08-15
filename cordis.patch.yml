@@ -1,0 +1,9 @@
+# deepseek-api-status bundle: DeepSeek balance & status panel for the Web profile.
+#
+# One dual-face row: the host half (lib/index.js) registers the
+# /deepseek-api/status route on the webserver; the client half (the package's
+# dsh.client metadata) serves lib/client.js, which registers the "Balance"
+# footer action ABOVE the Settings button plus the floating status panel.
+- insert:
+    - id: deepseek-api-status
+      name: 'deepseek-api-status'
