@@ -1,7 +1,7 @@
 {
   "name": "deepseek-api-status",
-  "version": "0.2.0",
-  "description": "DeepSeek API balance & usage panel for the DeepSeek Harness web GUI: always-visible strip above the Settings button — balance, cumulative/today spend, tokens, request counts, auto-refresh every minute.",
+  "version": "0.3.0",
+  "description": "DeepSeek API balance & usage card for the DeepSeek Harness web GUI: always-visible strip above the Settings button + reference-style usage card (balance, cumulative/period spend, tokens, request counts, mini chart), auto-refresh every minute.",
   "keywords": [
     "deepseek",
     "dsh",

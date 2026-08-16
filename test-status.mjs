@@ -4,7 +4,7 @@ import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { collectStatus, updateTracking, normalizeBalance, maskKey } from "./lib/status.js";
-import { parsePlatformUsage } from "./lib/platform.js";
+import { aggregateUsageDays, localDate } from "./lib/platform.js";
 
 const credentialsText = readFileSync("C:/Users/24595/.dsh/.credentials.yaml", "utf8");
 const realKey = credentialsText.match(/DEEPSEEK_API_KEY:\s*["']?([^"'\s]+)/)?.[1];
@@ -46,48 +46,26 @@ function makeCtx(overrides = {}) {
 	console.log("=== not configured ===");
 	console.log(JSON.stringify(payload, null, 2));
 }
-// 3) platform usage parser with a synthetic envelope
+// 3) platform usage aggregation with a synthetic day list
 {
-	const amountPayload = {
-		code: 0,
-		data: {
-			biz_code: 0,
-			biz_data: [{
-				total: [{ model: "deepseek-chat", usage: [
-					{ type: "PROMPT_CACHE_HIT_TOKEN", amount: 1000 },
-					{ type: "PROMPT_CACHE_MISS_TOKEN", amount: 2000 },
-					{ type: "RESPONSE_TOKEN", amount: 500 },
-					{ type: "REQUEST", amount: 12 }
-				] }],
-				days: [{
-					date: new Date().toISOString().slice(0, 10),
-					data: [{ model: "deepseek-chat", usage: [
-						{ type: "PROMPT_CACHE_HIT_TOKEN", amount: "100" },
-						{ type: "PROMPT_CACHE_MISS_TOKEN", amount: "200" },
-						{ type: "RESPONSE_TOKEN", amount: "50" },
-						{ type: "REQUEST", amount: "3" }
-					] }]
-				}]
-			}]
-		}
+	const now = new Date();
+	const mkDay = (offset, cost, tokens, requests) => {
+		const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
+		return { date: localDate(d), cost, tokens, requests };
 	};
-	const costPayload = {
-		code: 0,
-		data: {
-			biz_code: 0,
-			biz_data: [{
-				currency: "CNY",
-				total: [{ model: "deepseek-chat", usage: [{ amount: 0.123456 }, { amount: 0.0001 }] }],
-				days: [{
-					date: new Date().toISOString().slice(0, 10),
-					data: [{ model: "deepseek-chat", usage: [{ amount: 0.05 }] }]
-				}]
-			}]
-		}
-	};
-	const parsed = parsePlatformUsage(amountPayload, costPayload);
-	console.log("=== parsePlatformUsage (synthetic) ===");
-	console.log(JSON.stringify(parsed, null, 2));
+	const days = [];
+	for (let i = 0; i < 35; i++) {
+		days.push(mkDay(i, 0.01 * (i + 1), 1000 * (i + 1), i + 1));
+	}
+	const aggregated = aggregateUsageDays(days, now);
+	console.log("=== aggregateUsageDays (synthetic 35 days) ===");
+	console.log(JSON.stringify({
+		today: aggregated.today,
+		month: aggregated.month,
+		days30: aggregated.days30,
+		chartDays: aggregated.days.length,
+		chartLast: aggregated.days[aggregated.days.length - 1]
+	}, null, 2));
 }
 
 // 4) balance-delta tracking: baseline, spend, top-up handling
