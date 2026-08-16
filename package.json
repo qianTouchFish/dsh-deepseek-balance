@@ -1,6 +1,6 @@
 {
     "name":  "deepseek-api-status",
-    "version":  "0.3.3",
+    "version":  "0.4.0",
     "description":  "DeepSeek API balance \u0026 usage card for the DeepSeek Harness web GUI: always-visible strip above the Settings button + reference-style usage card (balance, cumulative/period spend, tokens, request counts, mini chart), auto-refresh every minute.",
     "keywords":  [
                      "deepseek",
