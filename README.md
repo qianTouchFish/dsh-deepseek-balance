@@ -1,4 +1,6 @@
-# deepseek-api-status
+# dsh-deepseek-balance
+
+> **仓库名**:`dsh-deepseek-balance`;**npm 包名**:`deepseek-api-status`(安装 / 卸载命令使用包名,仓库与包名相互独立,详见 [Install](#install--安装入口))。
 
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **Web 界面**插件:在侧边栏"**设置**"按钮正上方**常显** DeepSeek API 用量条(余额 / 消费金额 / API 请求 / Tokens),点击展开完整卡片——按模型、按时间维度查看消费,官方累计消费,支持浅色/深色主题,每分钟自动刷新。
 
@@ -39,6 +41,8 @@ cd deepseek-api-status && dsh plugin --profile web add .
 
 1. 重启 Web 应用(桌面图标 / `dsh web`),刷新页面;
 2. 侧边栏底部、**设置按钮上方**即出现用量条。
+
+> **包名说明**:npm 包名保持 `deepseek-api-status`(与仓库名 `dsh-deepseek-balance` 不同),目的是不改动已安装 profile 中的 `link:` 依赖。安装、卸载、手动配置里的 id/name 都用包名 `deepseek-api-status`。
 
 > 手动安装(不用 `dsh plugin`):把包放进 profile 的 `node_modules`,并在 `~/.dsh/profiles/web/cordis.patch.yml` 追加:
 >
