@@ -4,7 +4,7 @@ import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { collectStatus, updateTracking, normalizeBalance, maskKey } from "./lib/status.js";
-import { aggregateUsageDays, localDate } from "./lib/platform.js";
+import { aggregateUsageDays, localDate, fetchCumulativeConsumption } from "./lib/platform.js";
 
 const credentialsText = readFileSync("C:/Users/24595/.dsh/.credentials.yaml", "utf8");
 const realKey = credentialsText.match(/DEEPSEEK_API_KEY:\s*["']?([^"'\s]+)/)?.[1];
@@ -47,29 +47,48 @@ function makeCtx(overrides = {}) {
 	console.log("=== not configured ===");
 	console.log(JSON.stringify(payload, null, 2));
 }
-// 3) platform usage aggregation with a synthetic day list
+// 3) platform usage aggregation with a synthetic day list (per-model rows)
 {
 	const now = new Date();
-	const mkDay = (offset, cost, tokens, requests) => {
-		const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - offset);
-		return { date: localDate(d), cost, tokens, requests };
-	};
 	const days = [];
 	for (let i = 0; i < 35; i++) {
-		days.push(mkDay(i, 0.01 * (i + 1), 1000 * (i + 1), i + 1));
+		const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+		days.push({
+			date: localDate(d),
+			models: [
+				{ model: "deepseek-v4-flash", cost: 0.01 * (i + 1), tokens: 1000 * (i + 1), requests: i + 1 },
+				{ model: "deepseek-v4-pro", cost: 0.005 * (i + 1), tokens: 500 * (i + 1), requests: 0 }
+			]
+		});
 	}
 	const aggregated = aggregateUsageDays(days, now);
-	console.log("=== aggregateUsageDays (synthetic 35 days) ===");
+	const flash = aggregated.models.find((m) => m.model === "deepseek-v4-flash");
+	const pro = aggregated.models.find((m) => m.model === "deepseek-v4-pro");
+	console.log("=== aggregateUsageDays (synthetic per-model 35 days) ===");
 	console.log(JSON.stringify({
-		today: aggregated.today,
-		yesterday: aggregated.yesterday,
-		days7: aggregated.days7,
-		days30: aggregated.days30,
-		month: aggregated.month,
-		lastMonth: aggregated.lastMonth,
-		chartDays: aggregated.days.length,
-		chartLast: aggregated.days[aggregated.days.length - 1]
+		account: {
+			today: aggregated.today,
+			yesterday: aggregated.yesterday,
+			days7: aggregated.days7,
+			days30: aggregated.days30,
+			month: aggregated.month,
+			lastMonth: aggregated.lastMonth
+		},
+		flash: { today: flash.today, month: flash.month, chartDays: flash.days.length },
+		pro: { today: pro.today, month: pro.month },
+		modelCount: aggregated.models.length
 	}, null, 2));
+}
+
+// 3b) official cumulative consumption (real token, platform get_user_summary)
+{
+	const credentialsText2 = readFileSync("C:/Users/24595/.dsh/.credentials.yaml", "utf8");
+	const token = credentialsText2.match(/DEEPSEEK_PLATFORM_TOKEN:\s*[^a-zA-Z]?([^\s]+)/)?.[1];
+	if (token) {
+		const cumulative = await fetchCumulativeConsumption(token);
+		console.log("=== fetchCumulativeConsumption (real) ===");
+		console.log(JSON.stringify({ cumulative }, null, 2));
+	}
 }
 
 // 4) balance-delta tracking: baseline, spend, top-up handling
