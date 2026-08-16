@@ -20,7 +20,8 @@ function makeCtx(overrides = {}) {
 				if (ref === "DEEPSEEK_API_KEY") return "apiKey" in overrides ? overrides.apiKey : { value: realKey, source: "file" };
 				if (ref === "DEEPSEEK_PLATFORM_TOKEN") return overrides.platformToken;
 				return undefined;
-			}
+			},
+			describe: async (ref) => ({ configured: ref === "DEEPSEEK_API_KEY" })
 		}
 	};
 }
@@ -61,8 +62,11 @@ function makeCtx(overrides = {}) {
 	console.log("=== aggregateUsageDays (synthetic 35 days) ===");
 	console.log(JSON.stringify({
 		today: aggregated.today,
-		month: aggregated.month,
+		yesterday: aggregated.yesterday,
+		days7: aggregated.days7,
 		days30: aggregated.days30,
+		month: aggregated.month,
+		lastMonth: aggregated.lastMonth,
 		chartDays: aggregated.days.length,
 		chartLast: aggregated.days[aggregated.days.length - 1]
 	}, null, 2));
