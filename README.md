@@ -1,6 +1,6 @@
 # dsh-deepseek-balance
 
-> **仓库名**:`dsh-deepseek-balance`;**npm 包名**:`deepseek-api-status`(安装 / 卸载命令使用包名,仓库与包名相互独立,详见 [Install](#install--安装入口))。
+> 仓库名、npm 包名、插件 id 统一为 `dsh-deepseek-balance`。
 
 一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **Web 界面**插件:在侧边栏"**设置**"按钮正上方**常显** DeepSeek API 用量条(余额 / 消费金额 / API 请求 / Tokens),点击展开完整卡片——按模型、按时间维度查看消费,官方累计消费,支持浅色/深色主题,每分钟自动刷新。
 
@@ -34,7 +34,7 @@ dsh plugin --profile web add github:qianTouchFish/dsh-deepseek-balance
 dsh plugin --profile web add git+https://github.com/qianTouchFish/dsh-deepseek-balance.git
 
 # 方式三:本地目录(开发调试)
-cd deepseek-api-status && dsh plugin --profile web add .
+cd dsh-deepseek-balance && dsh plugin --profile web add .
 ```
 
 包声明了 `dsh.bundle`,`dsh plugin` 会自动把它加入 profile 的 bundle 层。然后:
@@ -42,14 +42,12 @@ cd deepseek-api-status && dsh plugin --profile web add .
 1. 重启 Web 应用(桌面图标 / `dsh web`),刷新页面;
 2. 侧边栏底部、**设置按钮上方**即出现用量条。
 
-> **包名说明**:npm 包名保持 `deepseek-api-status`(与仓库名 `dsh-deepseek-balance` 不同),目的是不改动已安装 profile 中的 `link:` 依赖。安装、卸载、手动配置里的 id/name 都用包名 `deepseek-api-status`。
-
 > 手动安装(不用 `dsh plugin`):把包放进 profile 的 `node_modules`,并在 `~/.dsh/profiles/web/cordis.patch.yml` 追加:
 >
 > ```yaml
 > - insert:
->     - id: deepseek-api-status
->       name: deepseek-api-status
+>     - id: dsh-deepseek-balance
+>       name: dsh-deepseek-balance
 > ```
 
 ## Configuration / 配置
@@ -82,7 +80,7 @@ DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用
 | 数据 | 来源 | 说明 |
 |---|---|---|
 | 余额 / 可用状态 / 充值余额 | `api.deepseek.com/user/balance` | 官方实时 |
-| **累计消费** | `platform.deepseek.com/api/v0/users/get_user_summary`(`total_costs`) | 官方累计;无平台令牌时回退余额差值**估算**(`$DSH_HOME/storages/deepseek-api-status.json`,充值自动校正,显示 `≈`) |
+| **累计消费** | `platform.deepseek.com/api/v0/users/get_user_summary`(`total_costs`) | 官方累计;无平台令牌时回退余额差值**估算**(`$DSH_HOME/storages/dsh-deepseek-balance.json`,充值自动校正,显示 `≈`) |
 | 各时间维度消费 / Tokens / 请求次数 / **按模型分类** | `platform.deepseek.com/api/v0/usage/amount` + `/usage/cost`(当前月 + 上月) | 官方平台数据(与控制台一致),需 `DEEPSEEK_PLATFORM_TOKEN` |
 
 ## How it works / 工作原理
@@ -112,7 +110,7 @@ node test-client.cjs   # 客户端 bundle 加载与注册
 ## Uninstall / 卸载
 
 ```sh
-dsh plugin --profile web remove deepseek-api-status
+dsh plugin --profile web remove dsh-deepseek-balance
 ```
 
 ## License

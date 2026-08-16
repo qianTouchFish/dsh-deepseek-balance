@@ -1,5 +1,5 @@
 {
-    "name":  "deepseek-api-status",
+    "name":  "dsh-deepseek-balance",
     "version":  "0.5.0",
     "description":  "DeepSeek API usage card for the DeepSeek Harness web GUI: always-visible strip above the Settings button + card anchored to its right — per-model and per-period spend/tokens/requests, official cumulative spend, light/dark themes, auto-refresh every minute.",
     "keywords":  [
