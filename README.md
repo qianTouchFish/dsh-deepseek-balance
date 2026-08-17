@@ -2,9 +2,9 @@
 
 > 仓库名、npm 包名、插件 id 统一为 `dsh-deepseek-balance`。
 
-一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **Web 界面**插件:在侧边栏"**设置**"按钮正上方**常显** DeepSeek API 用量条(余额 / 消费金额 / API 请求 / Tokens),点击展开完整卡片——按模型、按时间维度查看消费,官方累计消费,支持浅色/深色主题,每分钟自动刷新。
+一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **Web 界面**插件:在侧边栏"**设置**"按钮正上方**常显** DeepSeek API 用量条(余额 / 消费金额 / API 请求 / Tokens),点击展开完整卡片——按模型、按时间维度查看消费,官方累计消费,模型选择器旁实时显示**高峰/空闲**计费时段徽标,支持浅色/深色主题,每分钟自动刷新。
 
-A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **web GUI** plugin: an always-visible DeepSeek API usage strip **above the Settings button** in the sidebar (balance / spent / requests / tokens), expanding into a full card — per-model and per-period usage, official cumulative spend, light/dark theme support, auto-refresh every minute.
+A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **web GUI** plugin: an always-visible DeepSeek API usage strip **above the Settings button** in the sidebar (balance / spent / requests / tokens), expanding into a full card — per-model and per-period usage, official cumulative spend, a live peak/off-peak pricing window badge beside the model selector, light/dark theme support, auto-refresh every minute.
 
 ![布局示意: 侧边栏底部为用量条,卡片锚定在条的右方](docs/layout.svg)
 
@@ -13,6 +13,7 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **we
 - 侧边栏"设置"上方**常显用量条**:`余额 0.74 · 消费 11.99 · 请求 1.1k · Tkn 302M`(横向排列,窄条自动换行),每分钟自动刷新,低余额变黄;
 - 点击展开**参考风格用量卡片**(260px,锚定在条**右方** 14px,不遮挡侧边栏;打开时不压暗背景);
 - **模型选择器**:列出平台用量中的模型分类(`deepseek-v4-pro` / `deepseek-v4-flash` / `deepseek-chat & deepseek-reasoner`,无平台令牌时回退到 harness 模型目录)——选中后**消费金额 / API 请求 / Tokens 与迷你柱状图都切换为该模型的数据**;
+- **高峰/空闲时段徽标**:模型选择器右侧实时显示当前 DeepSeek 计费时段——北京时间 **09:00–12:00 / 14:00–18:00 为高峰**(费用翻倍,琥珀色),其余为**空闲**(绿色);每 30 秒自动刷新,悬停可查看完整时段;
 - **时间维度**:今天 / 昨天 / 近7天 / 近30天 / 本月 / 上月(选择同步到条的右端金额);
 - **API Key 选择器**:列出已配置的 DeepSeek 密钥(掩码显示),可切换查询的 key;
 - **充值余额 / 累计消费**:累计消费为**官方数据**(平台 `get_user_summary` 的 total_costs),无平台令牌时回退到余额差值估算(显示 `≈`);
@@ -82,6 +83,7 @@ DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用
 | 余额 / 可用状态 / 充值余额 | `api.deepseek.com/user/balance` | 官方实时 |
 | **累计消费** | `platform.deepseek.com/api/v0/users/get_user_summary`(`total_costs`) | 官方累计;无平台令牌时回退余额差值**估算**(`$DSH_HOME/storages/dsh-deepseek-balance.json`,充值自动校正,显示 `≈`) |
 | 各时间维度消费 / Tokens / 请求次数 / **按模型分类** | `platform.deepseek.com/api/v0/usage/amount` + `/usage/cost`(当前月 + 上月) | 官方平台数据(与控制台一致),需 `DEEPSEEK_PLATFORM_TOKEN` |
+| 高峰/空闲时段 | DeepSeek 官方峰谷计费公告 | 北京时间 09:00–12:00 / 14:00–18:00 为高峰,其余空闲(客户端本地按北京时区判定,无需网络) |
 
 ## How it works / 工作原理
 
@@ -91,7 +93,7 @@ DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用
 | 状态采集 | `lib/status.js` | 余额拉取、凭据枚举(maskKey / collectKeys)、模型目录枚举(collectModels)、差值跟踪兜底 |
 | 平台用量 | `lib/platform.js` | usage/amount + usage/cost + get_user_summary 解析;账户级 + 按模型的六个时间切片 |
 | 令牌自动提取 | `lib/token.js` | 无头 Chrome/Edge + DevTools 协议从浏览器配置读取 `userToken` |
-| 浏览器侧 | `lib/client.js` | `dsh.client` web bundle:侧边栏用量条 + 自绘卡片(模型/时间/Key 选择、迷你图表、令牌管理),60 秒轮询,主题自适应,localStorage 持久化 |
+| 浏览器侧 | `lib/client.js` | `dsh.client` web bundle:侧边栏用量条 + 自绘卡片(模型/时间/Key 选择、迷你图表、令牌管理、高峰/空闲徽标),60 秒轮询,主题自适应,localStorage 持久化 |
 | 组合层 | `cordis.patch.yml` | `dsh.bundle` 补丁,插入加载项 |
 
 ## Development / 开发
