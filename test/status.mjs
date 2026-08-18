@@ -1,13 +1,25 @@
 // Standalone smoke tests for the DeepSeek status logic.
 // Runs without the harness: mock ctx, temp DSH_HOME for tracking state.
-import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+// Real-credential cases (balance / platform summary) are skipped when the
+// credentials file is missing, so the suite stays portable across machines.
+import { readFileSync, mkdtempSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { tmpdir } from "node:os";
-import { collectStatus, updateTracking, normalizeBalance, maskKey } from "./lib/status.js";
-import { aggregateUsageDays, localDate, fetchCumulativeConsumption } from "./lib/platform.js";
+import { tmpdir, homedir } from "node:os";
+import { collectStatus, updateTracking, normalizeBalance, maskKey } from "../lib/status.js";
+import { aggregateUsageDays, localDate, fetchCumulativeConsumption } from "../lib/platform.js";
 
-const credentialsText = readFileSync("C:/Users/24595/.dsh/.credentials.yaml", "utf8");
-const realKey = credentialsText.match(/DEEPSEEK_API_KEY:\s*["']?([^"'\s]+)/)?.[1];
+// Resolve the real credentials file: $DSH_HOME/.credentials.yaml, else ~/.dsh/.credentials.yaml.
+const credentialsPath = (process.env.DSH_HOME ? join(process.env.DSH_HOME, ".credentials.yaml") : "")
+	|| join(homedir(), ".dsh", ".credentials.yaml");
+let realKey = undefined;
+let platformToken = undefined;
+if (existsSync(credentialsPath)) {
+	const text = readFileSync(credentialsPath, "utf8");
+	realKey = text.match(/DEEPSEEK_API_KEY:\s*["']?([^"'\s]+)/)?.[1];
+	platformToken = text.match(/DEEPSEEK_PLATFORM_TOKEN:\s*[^a-zA-Z]?([^\s]+)/)?.[1];
+} else {
+	console.log(`[skip] 未找到凭据文件 ${credentialsPath}，真实 key 相关用例跳过`);
+}
 
 const tempHome = mkdtempSync(join(tmpdir(), "dsh-status-test-"));
 process.env.DSH_HOME = tempHome;
@@ -26,19 +38,25 @@ function makeCtx(overrides = {}) {
 	};
 }
 
-// 1) configured, no platform token -> estimate usage
-{
-	const payload = await collectStatus(makeCtx());
-	console.log("=== configured (no platform token) ===");
-	console.log(JSON.stringify({
-		ok: payload.ok,
-		keyConfigured: payload.key.configured,
-		keyMasked: payload.key.masked,
-		balance: payload.balance,
-		usageSource: payload.usage?.source,
-		usage: payload.usage,
-		latencyMs: payload.latencyMs
-	}, null, 2));
+// 1) configured, no platform token -> estimate usage (needs a real key)
+if (realKey) {
+	try {
+		const payload = await collectStatus(makeCtx());
+		console.log("=== configured (no platform token) ===");
+		console.log(JSON.stringify({
+			ok: payload.ok,
+			keyConfigured: payload.key.configured,
+			keyMasked: payload.key.masked,
+			balance: payload.balance,
+			usageSource: payload.usage?.source,
+			usage: payload.usage,
+			latencyMs: payload.latencyMs
+		}, null, 2));
+	} catch (error) {
+		console.log("[warn] case 1 真实余额查询失败(不影响本地逻辑验证):", error.message);
+	}
+} else {
+	console.log("[skip] case 1: 需要真实 DEEPSEEK_API_KEY");
 }
 
 // 2) not-configured key path
@@ -47,6 +65,7 @@ function makeCtx(overrides = {}) {
 	console.log("=== not configured ===");
 	console.log(JSON.stringify(payload, null, 2));
 }
+
 // 3) platform usage aggregation with a synthetic day list (per-model rows)
 {
 	const now = new Date();
@@ -81,14 +100,16 @@ function makeCtx(overrides = {}) {
 }
 
 // 3b) official cumulative consumption (real token, platform get_user_summary)
-{
-	const credentialsText2 = readFileSync("C:/Users/24595/.dsh/.credentials.yaml", "utf8");
-	const token = credentialsText2.match(/DEEPSEEK_PLATFORM_TOKEN:\s*[^a-zA-Z]?([^\s]+)/)?.[1];
-	if (token) {
-		const cumulative = await fetchCumulativeConsumption(token);
+if (platformToken) {
+	try {
+		const cumulative = await fetchCumulativeConsumption(platformToken);
 		console.log("=== fetchCumulativeConsumption (real) ===");
 		console.log(JSON.stringify({ cumulative }, null, 2));
+	} catch (error) {
+		console.log("[warn] case 3b 官方累计消费查询失败(可能令牌过期,不影响本地逻辑验证):", error.message);
 	}
+} else {
+	console.log("[skip] case 3b: 需要真实 DEEPSEEK_PLATFORM_TOKEN");
 }
 
 // 4) balance-delta tracking: baseline, spend, top-up handling

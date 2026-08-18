@@ -12,7 +12,7 @@ global.window = {
 	}
 };
 
-const code = fs.readFileSync(path.join(__dirname, "lib", "client.js"), "utf8");
+const code = fs.readFileSync(path.join(__dirname, "..", "lib", "client.js"), "utf8");
 const requireStub = (id) => {
 	if (id === "react/jsx-runtime") return { jsx: () => ({}), jsxs: () => ({}) };
 	if (id === "react") return { useState: (v) => [v, () => {}], useEffect: () => {}, useMemo: (f) => f(), Fragment: Symbol("Fragment") };
