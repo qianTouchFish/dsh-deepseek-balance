@@ -1,7 +1,5 @@
 # dsh-deepseek-balance
 
-> 仓库名、npm 包名、插件 id 统一为 `dsh-deepseek-balance`。
-
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/qianTouchFish/dsh-deepseek-balance)](https://github.com/qianTouchFish/dsh-deepseek-balance/releases)
 
@@ -23,7 +21,7 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **we
 ## 安装前提 / Prerequisites
 
 - **DeepSeek Harness (DSH)** 已安装并可使用 Web 界面;需要 **DSH CLI** 与 [pnpm](https://pnpm.io/installation);
-- **DeepSeek API Key**(`DEEPSEEK_API_KEY`,必需):余额实时查询,与 harness 模型同源;在「设置 → 模型」页面填写,存于 `~/.dsh/.credentials.yaml`;
+- **DeepSeek API Key**(`DEEPSEEK_API_KEY`,必需):在「设置 → 模型」页面填写;
 - **平台令牌**(`DEEPSEEK_PLATFORM_TOKEN`,可选):解锁官方 Tokens / 请求次数 / 按模型分类 / 官方累计消费;可安装后在卡片内点【自动获取】一键提取;
 - **自动获取令牌**:需本机已登录 https://platform.deepseek.com 的 **Chrome / Edge / Chromium**(Windows / macOS / Linux 均可,不支持隐身模式)。
 
