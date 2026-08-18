@@ -1,6 +1,6 @@
 {
     "name":  "dsh-deepseek-balance",
-    "version":  "0.6.0",
+    "version":  "0.7.0",
     "description":  "DeepSeek API usage card for the DeepSeek Harness web GUI: always-visible strip above the Settings button + card anchored to its right — per-model and per-period spend/tokens/requests, official cumulative spend, live peak/off-peak pricing window badge, light/dark themes, auto-refresh every minute.",
     "keywords":  [
                      "deepseek",
