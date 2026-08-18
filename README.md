@@ -17,7 +17,7 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) **we
 - **时间维度**:今天 / 昨天 / 近7天 / 近30天 / 本月 / 上月(选择同步到条的右端金额);
 - **API Key 选择器**:列出已配置的 DeepSeek 密钥(掩码显示),可切换查询的 key;
 - **充值余额 / 累计消费**:累计消费为**官方数据**(平台 `get_user_summary` 的 total_costs),无平台令牌时回退到余额差值估算(显示 `≈`);
-- **令牌管理**:卡片底部【手动输入】【自动获取】——自动获取直接从浏览器配置(Chrome/Edge)提取平台令牌并自动保存;手动输入可粘贴保存;操作提示 5 秒后自动消失;
+- **令牌管理**:卡片底部【手动输入】【自动获取】——自动获取直接从本机浏览器配置(Windows/macOS/Linux 的 Chrome/Edge/Chromium)提取平台令牌并自动保存;手动输入可粘贴保存;操作提示 5 秒后自动消失;
 - **选择持久化**:时间维度 / API Key / 模型选择存于 localStorage,刷新页面不丢失;
 - **下拉交互**:点击任意空白处关闭下拉;选项点击正常选中;
 - **浅色 / 深色主题自适应**(完整双调色板,监听主题切换实时更新);
@@ -64,7 +64,7 @@ cd dsh-deepseek-balance && dsh plugin --profile web add .
 
 DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用会话令牌。两种方式:
 
-1. **自动(卡片内一键)**:打开卡片 → 底部【自动获取】→ 插件自动扫描你的 Chrome/Edge 浏览器配置,提取 `userToken` 并保存;
+1. **自动(卡片内一键)**:打开卡片 → 底部【自动获取】→ 插件自动扫描本机浏览器配置(Windows/macOS/Linux 的 Chrome/Edge/Chromium),提取 `userToken` 并保存;
 2. **手动**:浏览器登录 https://platform.deepseek.com → F12 → Console 执行:
    ```js
    JSON.parse(localStorage.getItem('userToken')).value
@@ -92,9 +92,24 @@ DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用
 | 宿主侧 | `lib/index.js` | Cordis 插件(`inject: credentials, webServer, llm`),注册 `GET /api/deepseek-status` 与 `POST /api/deepseek-token`(保存 / 自动获取平台令牌) |
 | 状态采集 | `lib/status.js` | 余额拉取、凭据枚举(maskKey / collectKeys)、模型目录枚举(collectModels)、差值跟踪兜底 |
 | 平台用量 | `lib/platform.js` | usage/amount + usage/cost + get_user_summary 解析;账户级 + 按模型的六个时间切片 |
-| 令牌自动提取 | `lib/token.js` | 无头 Chrome/Edge + DevTools 协议从浏览器配置读取 `userToken` |
+| 令牌自动提取 | `lib/token.js` | 无头浏览器 + DevTools 协议从本机配置读取 `userToken`(Windows/macOS/Linux 的 Chrome/Edge/Chromium) |
 | 浏览器侧 | `lib/client.js` | `dsh.client` web bundle:侧边栏用量条 + 自绘卡片(模型/时间/Key 选择、迷你图表、令牌管理、高峰/空闲徽标),60 秒轮询,主题自适应,localStorage 持久化 |
 | 组合层 | `cordis.patch.yml` | `dsh.bundle` 补丁,插入加载项 |
+
+## Layout / 目录结构
+
+```
+lib/              宿主(host)与浏览器(client)逻辑
+  index.js        Cordis 插件入口:注册 /api/deepseek-status 与 /api/deepseek-token 路由
+  status.js       余额拉取、凭据枚举、模型目录枚举、余额差值跟踪兜底
+  platform.js     平台用量接口解析(usage/amount + usage/cost + get_user_summary)与周期聚合
+  token.js        无头浏览器自动提取 userToken(跨平台)
+  client.js       web bundle:侧边栏用量条 + 自绘卡片(模型/时间/Key 选择、迷你图表、令牌管理、高峰/空闲徽标)
+test/             冒烟测试(无 harness 依赖)
+  client.cjs      客户端 bundle 加载与注册
+  status.mjs      服务端逻辑:余额/平台解析/差值跟踪/官方累计消费(真实凭据缺失时自动跳过)
+docs/             文档与示意图
+```
 
 ## Development / 开发
 
@@ -103,8 +118,9 @@ DeepSeek API 不公开用量查询接口;官方数据来自平台控制台所用
 dsh plugin --profile web add .
 
 # 冒烟测试(无需 harness)
-node test-status.mjs   # 服务端逻辑(真实 key / 平台解析 / 差值跟踪 / 官方累计消费)
-node test-client.cjs   # 客户端 bundle 加载与注册
+npm test               # 依次运行全部冒烟测试
+node test/status.mjs   # 服务端逻辑(真实 key / 平台解析 / 差值跟踪 / 官方累计消费;无凭据时自动跳过)
+node test/client.cjs   # 客户端 bundle 加载与注册
 ```
 
 修改 `lib/client.js` 后需重启 `dsh web` 并强制刷新页面(Ctrl+Shift+R)。
