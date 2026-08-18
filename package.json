@@ -9,8 +9,7 @@
                      "dsh-plugin",
                      "plugin",
                      "balance",
-                     "usage",
-                     "余额"
+                     "usage"
                  ],
     "author":  "qianTouchFish",
     "license":  "MIT",
