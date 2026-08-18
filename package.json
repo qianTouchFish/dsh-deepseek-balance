@@ -6,9 +6,11 @@
                      "deepseek",
                      "dsh",
                      "deepseek-harness",
+                     "dsh-plugin",
                      "plugin",
                      "balance",
-                     "usage"
+                     "usage",
+                     "余额"
                  ],
     "author":  "qianTouchFish",
     "license":  "MIT",
